@@ -1,2 +1,2 @@
 # High-School
-Programs related to school
+Grade Programs related to school. Calculate math grades based on expected score.
