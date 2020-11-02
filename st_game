@@ -1,0 +1,322 @@
+from random import randint
+import time
+import termcolor as termcolor
+from termcolor import colored
+
+
+
+v_morning_choices = ['1 - View Inventory', '2 - View Stats', '3 - Eat a Waffle', '4 - Quit']
+v_game_choices = ['1 - Stay Put for the Day','2 - Move']
+player_inventory = ['walkie talkie','flashlight']
+
+
+def displayMenu(choices):
+    print 'Options:'.ljust(50).rjust(60)
+    for a in choices:
+        print colored(a.ljust(50).rjust(60),'blue')
+
+
+def getUserChoice(choices):
+    displayMenu(choices)
+    round = 0
+    while round == 0:
+        question = int(input('Choose an option by the numbers on the left hand side: '))
+        if question < (len(choices) + 1):
+            if question > 0:
+                return question
+        else:
+            print 'Number not in range. Try again'
+
+
+####################################
+
+shed_weapons = ["Sword", "Bicycle", "Hi-C", "Heelys","Walkman", "Laser Cannon", "Rubber Band"]
+
+
+def calcDamage(weapon):
+    if weapon == 'walkie talkie':
+        return 10
+    elif weapon == 'flashlight':
+        return 5
+    elif weapon == 'Rubber Band':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 25
+    elif weapon == 'Sword':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 50
+    elif weapon == 'Laser Cannon':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 100
+    elif weapon == 'Hi-C':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 4
+    elif weapon == 'Walkman':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 1
+    elif weapon == 'Bicycle':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 2
+    elif weapon == 'Heelys':
+        for a in player_inventory:
+            if a != weapon:
+                player_inventory.append(weapon)
+        return 3
+    else:
+        return 0
+
+
+####################################
+
+
+shelf_food = ["Reese's Pieces", "Pop Rocks", "Ovaltine","Wonder Bread", "Twinkies"]
+food = shelf_food[randint(0,4)]
+
+def eat(food, player_health):
+    print 'You have found {}'.format(food)
+    ask = raw_input('do you want to eat this? Yes or No: ')
+    if ask.lower() == 'y':
+        if food == "Reese's Pieces":
+            player_health = player_health - 30
+        elif food == "Pop Rocks":
+            player_health = player_health - 15
+        elif food == "Ovaltine":
+            player_health = player_health + 15
+        elif food == "Wonder Bread":
+            player_health = player_health + 25
+        elif food == "Twinkies":
+            player_health = player_health + 30
+        elif food == "Waffle":
+            player_health = player_health + 10
+        if player_health > 100:
+            player_health = 100
+        return player_health
+    else:
+        return player_health
+
+####################################
+
+
+def fight(player_health,f_item,inventory):
+    demo_health = 300
+    demo_base_attack = 20
+    for a in inventory:
+        if a == 'Hi-C':
+            demo_health = 150
+        elif a == 'Walkman':
+            demo_base_attack = 15
+        else:
+            round = 0
+            while round == 0:
+                print colored('My health is {}'.format(player_health),'magenta')
+                print colored('Demogorgon health is {}'.format(demo_health),'green')
+                choice = raw_input('Would you like to fight,flee,or flail?: ')
+                if choice == 'fight':
+                    player_health = player_health - demo_base_attack
+                    v_damage = calcDamage(f_item)
+                    demo_health = demo_health - v_damage
+                elif choice == 'flee':
+                    num = randint(1,10)
+                    if num <= 3:
+                        print colored('Escape successful!','yellow')
+                        round = 1
+                        return player_health
+                    else:
+                        player_health = player_health - (0.5 * demo_base_attack)
+                elif choice == 'flail':
+                    player_health = 0
+                if player_health <= 0:
+                    player_health = 0
+                    return player_health
+                if demo_health <= 0:
+                    print colored('You have defeated the demogorgon today. Congrats!','yellow')
+                    return player_health
+
+####################################
+
+
+def stay(player_health,v_item,inventory):
+    num = randint(1,10)
+    if num <= 3:
+        print colored('Nothing happened today. Your health will be restored to the maximum.','yellow')
+        player_health = 100
+        return player_health
+    else:
+        print colored('Oh no! The demogorgon has found you!','yellow')
+        player_health = fight(player_health,v_item,inventory)
+        if player_health <= 0:
+            print colored('You have lost the fight and are now dead.','cyan')
+            return player_health
+        else:
+            print colored('You came out alive! Yay for you!','cyan')
+            return player_health
+
+####################################
+
+def trench(player_health, day,distance):
+    distance_today = ((player_health / 4) + 5) / 2
+    distance = distance + distance_today
+    print colored('Oh no! You fell in a trench.','red')
+    #print 'You have traveled {} miles today. {} miles total.'.format(distance_today,distance)
+    day = day + 1
+    print colored('You will need to skip day {}.'.format(day),'red')
+    return player_health, day, distance
+
+###################################
+
+
+def move(player_health,distance,item,day,inventory):
+    num = randint(1,10)
+    if num > 0 and num <=2:
+        shelf_food = ["Reese's Pieces", "Pop Rocks", "Ovaltine", "Wonder Bread", "Twinkies"]
+        food = shelf_food[randint(0, 4)]
+        player_health = eat(food, player_health)
+        distance = (player_health / 4) + 5
+        return player_health,distance,item,day,inventory
+
+    elif num >= 3 and num <= 4:
+        shed_weapons = ["Sword", "Bicycle", "Hi-C", "Heelys", "Walkman", "Laser Cannon", "Rubber Band"]
+        item = shed_weapons[randint(0, 6)]
+        print 'You found a {} in an old shed.'.format(item)
+        player_inventory.append(item)
+        if calcDamage(item) == 3:
+            new_distance = 1.25 * ((player_health / 4) + 5)
+            distance = new_distance + distance
+            print 'Distance traveled today is {} miles'.format(new_distance)
+            return player_health,distance,item,day,inventory
+
+        elif calcDamage(item) == 2:
+            new_distance = 1.5 * ((player_health / 4) + 5)
+            distance = new_distance + distance
+            print 'Distance traveled today is {} miles'.format(new_distance)
+            return player_health,distance,item,day,inventory
+        else:
+            new_distance = (player_health / 4) + 5
+            distance = new_distance + distance
+            print 'Distance traveled today is {}'.format(new_distance)
+            return player_health,distance,item,day,inventory
+
+    elif num >= 5 and num <= 6:
+        player_health,day ,distance = trench(player_health,day,distance)
+        return player_health,distance,item,day,inventory
+
+    elif num >= 7 and num <= 9:
+        print colored('Oh no! The demogorgon has found you!','yellow')
+        player_health = fight(player_health, item, inventory)
+        if player_health <= 0:
+            print colored('The demogorgon has killed you. RIP','cyan')
+            return player_health,distance,item,day,inventory
+        else:
+            print colored('You came out alive! Yay for you!','cyan')
+            return player_health,distance,item,day,inventory
+    else:
+        print colored('Nothing happened to you today','cyan')
+        new_distance = (player_health / 4) + 5
+        distance = new_distance + distance
+        print '{} miles traveled today'.format(new_distance)
+        return player_health,distance,item,day,inventory
+
+#############################
+
+
+v_health = 100
+distance = 0
+day = 1
+item = ''
+
+
+print colored("You have been trapped in the upside-down. Survive for 7 days or reach the nearest city, 150 miles away. Good luck," \
+      " your time starts now...",'green')
+
+print ' '
+time.sleep(3)
+
+while day < 8 or v_health > 0 :
+    print '#######################################################################'
+    c = 0
+    round = 0
+    print colored('It is Day {}'.format(day),'red')
+    while round == 0:
+        my_choice = getUserChoice(v_morning_choices)
+        if my_choice == 1:
+            print 'Here are the items in your inventory:'
+            for a in player_inventory:
+                print a
+            switch = raw_input('would you like to change items? Yes or No: ')
+            if switch == 'Yes':
+                r = 0
+                change_item_found = 0
+                while r == 0:
+                    change_item = raw_input('What other item in the bag do you want to change it to? Type n/a '
+                                        'to not hold any item: ')
+                    if change_item == 'n/a':
+                        print 'You are not holding any item'
+                        item = ''
+                    else:
+                        for a in player_inventory:
+                            if a == change_item:
+                                item = change_item
+                                change_item_found = 'Yes'
+                        if change_item_found == 'Yes':
+                                print 'Item change = successful. You are holding the {}'.format(item)
+                                r = 1
+                        else:
+                            print 'That is not in your backpack. Try again.'
+        elif my_choice == 2:
+            print 'Your health is {}'.format(v_health)
+            print 'Distance traveled is {} miles'.format(distance)
+            if item != '':
+                print 'Your equipped item is {}'.format(item)
+            else:
+                print 'No equipped item'
+        elif my_choice == 3:
+            if c == 0:
+                print 'Waffle is eaten'
+                v_health = 10 + v_health
+                if v_health > 100:
+                    v_health = 100
+                print colored('Your health is now {}'.format(v_health),'magenta')
+                c = 1
+            else:
+                print 'You already ate today. Choose another option.'
+        elif my_choice == 4:
+            round = 1
+    location_choice = getUserChoice(v_game_choices)
+    if location_choice == 1:
+        v_health = stay(v_health,item,player_inventory)
+        if v_health == 0:
+            break
+        else:
+            print colored('Your health is {}'.format(v_health),'magenta')
+    if location_choice == 2:
+        v_health,distance,item,day,player_inventory = move(v_health,distance,item,day,player_inventory)
+        if v_health == 0:
+            break
+        else:
+            print colored('Your health is {}'.format(v_health),'magenta')
+            print colored('The total distance you have traveled is {} miles'.format(distance),'blue')
+    if distance >= 150:
+        print colored('Congrats!You have reached the closest city and have escaped!','yellow',attrs=['bold'])
+        break
+    day = day + 1
+    if day == 8:
+        print colored('Congrats! You have lived long enough and have escaped!','yellow',attrs=['bold'])
+        break
+
+
+
+
+
+
+
