@@ -1,4 +1,4 @@
-
+# this game lets you print out pascal's triangle
 def pascal(curr,row,p_list):
     if row == curr:
         print p_list
